@@ -152,3 +152,5 @@ The following instructions will import storm-starter as a new project in Intelli
     * It is strongly recommended to use Sun/Oracle JDK 6 rather than OpenJDK 6.
 * You may now optionally change the name of the project in IDEA.  The default name suggested by IDEA is "storm-starter".
   Click _Finish_ once you are done.
+
+* If you have problem with ClassNotFound errors, you can comment out the  `<scope>provided</scope>` tag for the maven dependency for the `storm-core` artifact.  The provided scope will not allow the classes to be added and instead assume they already are provided externally.
