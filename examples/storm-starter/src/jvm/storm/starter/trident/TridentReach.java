@@ -24,6 +24,8 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
 import storm.trident.TridentState;
 import storm.trident.TridentTopology;
 import storm.trident.operation.BaseFunction;
@@ -40,11 +42,13 @@ import storm.trident.tuple.TridentTuple;
 import java.util.*;
 
 public class TridentReach {
-  public static Map<String, List<String>> TWEETERS_DB = new HashMap<String, List<String>>() {{
-    put("foo.com/blog/1", Arrays.asList("sally", "bob", "tim", "george", "nathan"));
-    put("engineering.twitter.com/blog/5", Arrays.asList("adam", "david", "sally", "nathan"));
-    put("tech.backtype.com/blog/123", Arrays.asList("tim", "mike", "john"));
-  }};
+
+  public static final Multimap<String, String> TWEETERS_DB =
+            new ImmutableListMultimap.Builder<String, String>()
+                .putAll("foo.com/blog/1", "sally", "bob", "tim", "george", "nathan")
+                .putAll("engineering.twitter.com/blog/5", "adam", "david", "sally", "nathan")
+                .putAll("tech.backtype.com/blog/123", "tim", "mike", "john")
+                .build();
 
   public static Map<String, List<String>> FOLLOWERS_DB = new HashMap<String, List<String>>() {{
     put("sally", Arrays.asList("bob", "tim", "alice", "adam", "jim", "chris", "jai"));
@@ -123,7 +127,7 @@ public class TridentReach {
 
   public static StormTopology buildTopology(LocalDRPC drpc) {
     TridentTopology topology = new TridentTopology();
-    TridentState urlToTweeters = topology.newStaticState(new StaticSingleKeyMapState.Factory(TWEETERS_DB));
+    TridentState urlToTweeters = topology.newStaticState(new StaticSingleKeyMapState.Factory(TWEETERS_DB.asMap()));
     TridentState tweetersToFollowers = topology.newStaticState(new StaticSingleKeyMapState.Factory(FOLLOWERS_DB));
 
 
